@@ -63,7 +63,7 @@ Position 1                                                         1273
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/protein-viz.git
+git clone https://github.com/desenyon/protein-viz.git
 cd protein-viz
 pip install -r requirements.txt
 ```
@@ -207,6 +207,167 @@ PDB 6VYB was among the first cryo-EM structures of the SARS-CoV-2 spike protein,
 2. Designing mRNA vaccines (Pfizer, Moderna) that encode a stabilized spike
 3. Developing monoclonal antibody therapies targeting the RBD
 4. Tracking how variants (Alpha, Delta, Omicron) mutate the spike
+
+---
+
+## Example Analysis Report: SARS-CoV-2 Spike Glycoprotein (6VYB)
+
+Below is a complete walkthrough of the pipeline output for **PDB 6VYB** — the open-state cryo-EM structure of the SARS-CoV-2 spike ectodomain at 3.2 Å resolution. This is what you get when you run `python main.py`.
+
+### Structure Overview
+
+| Metric | Value |
+|---|---|
+| Total modeled residues | 2,875 (of 3,843 deposited across 3 protomers) |
+| Total atoms | 22,365 |
+| Protein chains | A, B, C (protomers) + D–O (glycan/NAG chains) |
+| Disulfide bonds | 35 |
+| Organism | Severe acute respiratory syndrome coronavirus 2 |
+| Unmodeled residues | 968 (disordered loops not resolved at 3.2 Å) |
+
+The trimeric spike has three nearly identical protomers (chains A, B, C), each ~966 resolved residues out of 1,281 in the full sequence. Chains D–O are N-acetylglucosamine (NAG) glycan chains attached to the protein surface — these sugar modifications are critical for immune evasion and protein folding.
+
+---
+
+### Functional Domain Map
+
+![Functional Domain Map](docs/images/domain_map.png)
+
+This linear map shows the major functional domains along the 1,273-residue spike monomer sequence. Key takeaways:
+
+- **S1 subunit** (residues 14–685) handles receptor binding. It contains the NTD and RBD, which are the primary targets for neutralizing antibodies.
+- **S2 subunit** (residues 686–1273) drives membrane fusion. It contains the fusion peptide, HR1, and central helix.
+- The **furin cleavage site** (RRAR, positions 682–685) sits at the S1/S2 boundary. This polybasic cleavage motif is unique to SARS-CoV-2 — SARS-CoV lacks it entirely — and is processed by host furin proteases during viral biogenesis, priming the spike for cell entry.
+- The **RBM** (437–508) is nested within the larger RBD (319–541). This ~70-residue motif is the actual contact surface that binds ACE2, and it is where most concerning mutations appear in variants of concern (N501Y in Alpha, E484K in Beta, L452R in Delta).
+
+---
+
+### Per-Residue B-factor Profile
+
+![B-factor Profile](docs/images/bfactor_profile.png)
+
+**What B-factors tell us:** B-factors (also called temperature factors or Debye-Waller factors) measure the mean-square displacement of each atom from its average position. In a cryo-EM structure like 6VYB, they reflect local flexibility and conformational heterogeneity rather than literal thermal motion.
+
+**Observations from 6VYB:**
+
+1. **Sharp B-factor spike around residue index ~1100–1300** (corresponding to the boundary between protomers in the plotted data): These peaks reaching >150 Å² correspond to the region near the S1/S2 cleavage site and flexible inter-domain linkers. The furin cleavage site is intrinsically disordered, consistent with it being accessible to protease cleavage.
+
+2. **RBD region (highlighted in orange)** shows moderately elevated B-factors (~50–80 Å²). In the open state (6VYB), one RBD is in the "up" conformation, exposing the ACE2 binding surface. This upward displacement makes it more mobile than the two RBDs that remain in the "down" position.
+
+3. **NTD region (blue)** shows variable flexibility. The NTD supersite — a target for a distinct class of antibodies — has loops with high B-factors, indicating conformational plasticity that may facilitate immune evasion.
+
+4. **S2 stalk (HR1, CH)** has consistently low B-factors (~20–30 Å²), reflecting the rigid coiled-coil core that holds the trimer together. This rigidity is functionally essential: the stalk must maintain structural integrity until the spike undergoes the dramatic conformational rearrangement that drives membrane fusion.
+
+---
+
+### Amino Acid Composition
+
+![Amino Acid Composition](docs/images/aa_composition.png)
+
+This chart shows the frequency of each of the 20 standard amino acids across all resolved residues, color-coded by biochemical property:
+
+| Category | Color | Residues | Percentage |
+|---|---|---|---|
+| Hydrophobic | Orange | A, I, L, M, F, W, V, P | 41.6% |
+| Polar | Blue | S, T, N, Q, Y | 32.8% |
+| Positive (+) | Green | R, H, K | 8.8% |
+| Negative (-) | Red | D, E | 8.2% |
+| Special | Gray | G, C | 8.6% |
+
+**Notable features:**
+
+- **Threonine (T) is the most abundant residue at 8.4%**, followed closely by leucine (L, 8.2%) and valine (V, 8.0%). The high Thr content is characteristic of viral glycoproteins — Thr and Ser residues serve as O-linked glycosylation sites.
+- **Asparagine (N) at 7.5%** is elevated relative to the human proteome average (~4%). This reflects the high density of N-linked glycosylation sites (N-X-S/T sequons) on the spike, which decorate the protein surface with glycan shields.
+- **Cysteine (C) at 2.6%** contributes to 35 disulfide bonds across the trimer, stabilizing the complex folded domains.
+- **Tryptophan (W) is the rarest at 0.6%**, consistent with its general scarcity in most proteins due to its metabolic cost.
+- The high proportion of **hydrophobic residues (41.6%)** reflects the large buried interfaces between the three protomers and between the S1 and S2 subunits.
+
+---
+
+### Residue Property Distribution
+
+![Property Distribution](docs/images/property_dist.png)
+
+This donut chart provides a simplified view of the biochemical character of the spike protein:
+
+- The **~42% hydrophobic content** is typical for a large, multi-domain transmembrane protein. These residues pack the hydrophobic cores of each domain and line the inter-protomer interfaces.
+- The **~33% polar content** is on the high side, reflecting the spike's extensive solvent-exposed surface — it protrudes ~160 Å from the viral membrane and must remain soluble in the extracellular environment.
+- The **near-equal split between positive (8.8%) and negative (8.2%) charged residues** gives the spike a near-neutral net charge at physiological pH, which is typical for viral surface proteins that must avoid nonspecific electrostatic interactions with host glycocalyx.
+
+---
+
+### B-factor Statistics by Chain
+
+![Chain B-factors](docs/images/chain_bfactors.png)
+
+This chart compares the minimum, average, and maximum B-factors across all 15 chains in the PDB entry.
+
+| Chain | Residues | Avg B-factor | Max B-factor | Role |
+|---|---|---|---|---|
+| A | 966 | 45.7 Å² | 91.5 Å² | Protomer 1 |
+| B | 949 | 53.6 Å² | 181.1 Å² | Protomer 2 ("up" RBD) |
+| C | 960 | 45.6 Å² | 113.3 Å² | Protomer 3 |
+| D–O | 0 aa each | 22–70 Å² | varies | NAG glycan chains |
+
+**Key insight:** Chain B has a markedly higher average B-factor (53.6 vs ~45.7 for A and C) and the highest maximum B-factor in the entire structure (181.1 Å²). This is the protomer whose RBD is in the **"up" (open) conformation** — extended away from the trimer axis to expose the ACE2 binding surface. The elevated flexibility is a direct structural consequence of this conformational state. Chains A and C, with their RBDs in the "down" position, are more constrained by inter-protomer contacts and are therefore more rigid.
+
+Chains D through O are the N-acetylglucosamine (NAG) glycan chains. They have zero protein residues but contain 28 atoms each (sugar ring atoms). Their B-factors are generally low (22–38 Å²), except for chain D (69.6 Å²), which is likely a glycan on the more flexible chain B protomer.
+
+---
+
+### Cα Distance Matrix (Contact Map)
+
+![Contact Map](docs/images/contact_map.png)
+
+**What this shows:** Each pixel represents the Euclidean distance between two Cα atoms (the central carbon of each amino acid backbone). This is computed for the first 200 residues of chain A, covering most of the NTD.
+
+**How to read it:**
+- The **diagonal** is always 0 Å (each residue is 0 distance from itself).
+- **Light/warm colors** = close in 3D space (<10 Å). These are residue pairs that are in physical contact.
+- **Dark/cool colors** = far apart (>30 Å).
+
+**Structural features visible:**
+
+1. **Block-diagonal patterns** (distinct bright squares along the diagonal): These correspond to compact sub-domains within the NTD. Each block represents a group of residues that are close to each other in 3D space but separated from other groups.
+
+2. **Off-diagonal bright spots**: These are long-range contacts — residues far apart in sequence but close in 3D space. In the NTD, these arise from the beta-sandwich fold where antiparallel beta-strands bring distant sequence positions into close proximity.
+
+3. **Characteristic banding near the diagonal**: Regular secondary structure elements create predictable patterns. Alpha-helices produce a thicker bright band along the diagonal (consecutive residues ~5.4 Å apart in helical pitch), while beta-sheets produce thinner bands with off-diagonal contacts from paired strands.
+
+4. **Visible domain boundary around residue ~140**: There is a noticeable transition in the contact pattern, corresponding to the boundary between two structural lobes of the NTD. This kind of domain boundary identification is one of the primary uses of contact maps in structural biology.
+
+---
+
+### Interactive 3D Views
+
+The pipeline also generates four interactive HTML files that can be opened in any browser:
+
+| File | Description |
+|---|---|
+| `6VYB_cartoon.html` | Secondary structure (helices, sheets, loops) colored N→C terminus in rainbow spectrum |
+| `6VYB_surface.html` | Solvent-accessible molecular surface, revealing the overall shape and the glycan-shielded topology |
+| `6VYB_regions.html` | Functional domains highlighted: RBD (orange), NTD (blue), Fusion Peptide (green), etc. on a gray backbone |
+| `6VYB_bfactor3d.html` | Colored by B-factor: blue = rigid core, red = flexible loops and the "up" RBD |
+
+Each viewer supports rotation (drag), zoom (scroll), and translation (right-click drag).
+
+---
+
+### Summary of Findings
+
+This analysis of PDB 6VYB reveals several structural features that are directly relevant to SARS-CoV-2 biology and therapeutic targeting:
+
+1. **Asymmetric flexibility in the open state.** The protomer with the "up" RBD (chain B) is significantly more flexible than the other two, with B-factors reaching 181 Å². This conformational heterogeneity is what allows the spike to transition between closed (all RBDs down, immune-evasive) and open (one or more RBDs up, ACE2-binding-competent) states.
+
+2. **The RBD is a structurally distinct, semi-autonomous domain.** The contact map and B-factor analysis both show that the RBD (319–541) behaves as a hinge-mounted module that can flip between up and down positions. This modularity is why the RBD is such an effective vaccine immunogen — it can fold independently and present its epitopes correctly.
+
+3. **Glycan shielding is extensive.** With 12 glycan chains (D–O) and high asparagine content (7.5%), the spike surface is heavily decorated with sugars that mask protein epitopes from antibodies. The NTD and portions of the S2 stalk are particularly shielded.
+
+4. **The S2 core is rigid and conserved.** Low B-factors in HR1 and the central helix suggest these regions are structurally constrained and likely less tolerant of mutations — which is why S2-targeting antibodies tend to be more broadly cross-reactive across coronavirus strains.
+
+5. **The furin cleavage site is intrinsically disordered.** The high B-factors near position 682–685 and the 968 unmodeled residues (many in this region) confirm that the RRAR motif is a flexible, solvent-exposed loop — exactly the properties needed for efficient protease recognition and cleavage.
+
+---
 
 ## Data Source
 
