@@ -87,10 +87,12 @@ def plot_bfactor_profile(bfactor_data: dict, pdb_id: str = "6VYB",
                  fontsize=14, fontweight="bold", pad=15)
 
     if key_regions:
-        ax.legend(loc="upper right", fontsize=8, framealpha=0.8,
-                 facecolor="#161b22", edgecolor="#30363d")
+        ax.legend(loc="upper left", fontsize=8, framealpha=0.95,
+                 facecolor="#161b22", edgecolor="#30363d",
+                 bbox_to_anchor=(0.0, 1.0))
 
     ax.set_xlim(0, len(bfactors))
+    fig.subplots_adjust(top=0.88)
     fig.tight_layout()
 
     path = OUTPUT_DIR / filename
@@ -306,29 +308,39 @@ def plot_key_regions_map(key_regions: list, total_length: int = 1273,
     setup_style()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    fig, ax = plt.subplots(figsize=(16, 4))
+    fig, ax = plt.subplots(figsize=(16, 5))
 
     # Draw full-length bar
-    ax.barh(0, total_length, height=0.4, color="#21262d", edgecolor="#30363d")
+    ax.barh(0, total_length, height=0.5, color="#21262d", edgecolor="#30363d")
 
-    region_colors = ["#58a6ff", "#f0883e", "#d2a8ff", "#3fb950",
-                     "#f778ba", "#79c0ff", "#ffa657"]
+    region_colors = ["#79c0ff", "#ffa657", "#d2a8ff", "#7ee787",
+                     "#ff9bce", "#a5d6ff", "#ffc680"]
 
     for i, region in enumerate(key_regions):
         color = region_colors[i % len(region_colors)]
         start = region["start"]
         width = region["end"] - region["start"]
 
-        ax.barh(0, width, left=start, height=0.4, color=color,
+        ax.barh(0, width, left=start, height=0.5, color=color,
                edgecolor="#0d1117", linewidth=1, alpha=0.9)
 
-        # Label
+    # Place labels below the bar with vertical offset to avoid overlap
+    label_y_offsets = [-0.55, -0.75, -0.95, -0.55, -0.75, -0.55, -0.75]
+    for i, region in enumerate(key_regions):
+        color = region_colors[i % len(region_colors)]
+        start = region["start"]
+        width = region["end"] - region["start"]
         mid = start + width / 2
-        ax.text(mid, 0.35, region["name"], ha="center", va="bottom",
-               fontsize=7, color=color, fontweight="bold", rotation=30)
+        y_off = label_y_offsets[i % len(label_y_offsets)]
+
+        # Draw connector line
+        ax.plot([mid, mid], [-0.25, y_off + 0.08], color=color,
+               linewidth=0.8, alpha=0.6)
+        ax.text(mid, y_off, region["name"], ha="center", va="top",
+               fontsize=8, color=color, fontweight="bold")
 
     ax.set_xlim(0, total_length)
-    ax.set_ylim(-0.5, 1.0)
+    ax.set_ylim(-1.3, 0.8)
     ax.set_xlabel("Residue Position", fontsize=12)
     ax.set_title(f"Functional Domain Map — {pdb_id} (SARS-CoV-2 Spike Glycoprotein)",
                  fontsize=14, fontweight="bold", pad=15)
